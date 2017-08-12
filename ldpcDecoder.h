@@ -9,7 +9,8 @@ public:
   ldpcDecoder(ldpcMatrix const &mat) :
     g(mat.get_edges()),
     numRows(mat.get_numRows()),
-    numCols(mat.get_numCols())
+    numCols(mat.get_numCols()),
+    numEdges(mat.get_edges().size())
   {
   }
 
@@ -32,7 +33,7 @@ public:
     
 protected:
   std::vector<ldpcMatrix::entry> const &g;
-  int numRows, numCols;
+  int numRows, numCols, numEdges;
 
   int maxIter;
 };

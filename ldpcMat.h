@@ -28,6 +28,7 @@ public:
       entry e = {r-1, *it-1};
       graph.push_back(e);
       if(*it > c) c= *it;
+      last_val = *it;
     }
     numRows = r;
     numCols = c;

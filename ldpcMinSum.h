@@ -13,8 +13,8 @@ public:
 
 protected:
 
-  void update_v2c();
-  void update_c2v();
+  int update_v2c();
+  int update_c2v();
   
   std::vector<double> v2c;
   std::vector<double> c2v;

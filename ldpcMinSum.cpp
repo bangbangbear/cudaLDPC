@@ -17,47 +17,43 @@ std::vector<int> ldpcMinSumDec::decode(std::vector<double> const &llr)
 {
   hd.assign(hd.size(), 1);
   llrIn = llr;
-  int err;
 
-  std::cout <<"maxIter = " << maxIter <<std::endl;
-  for(int i = 0; i < maxIter; i++) {
+  int usc = -1;
+  for(int i = 0; i < maxIter && usc; i++) {
     update_v2c();
-    update_c2v();
-    if((err = check_parity(hd)) == 0) {
-      break;
-    }
-    std::cout <<err <<" errors remain after iter " << i <<std::endl;
+    usc = update_c2v();
   }
 
   return hd;
 }
 
 
-void ldpcMinSumDec::update_v2c()
+int ldpcMinSumDec::update_v2c()
 {
   std::vector<double> sum_llr = llrIn;
 
   int ind = 0;
-  for(auto it = g.begin(); it != g.end(); it++) {
-    sum_llr[it->col] += c2v[ind++];
+  for(auto it = g.begin(); it != g.end(); ++it, ++ind) {
+    sum_llr[it->col] += c2v[ind];
   }
   ind = 0;
-  for(auto it = g.begin(); it != g.end(); it++) {
+  for(auto it = g.begin(); it != g.end(); ++it, ++ind) {
     v2c[ind] = sum_llr[it->col] - c2v[ind];
-    ind++;
   }
 
   std::transform(sum_llr.begin(), sum_llr.end(), hd.begin(), std::bind2nd(std::less<double>(), 0.0));
+
+  return 0;
 }
 
-void ldpcMinSumDec::update_c2v()
+int ldpcMinSumDec::update_c2v()
 {
   std::vector<int> sign(numRows, 1);
   std::vector<double> min1(numRows, 1e32), min2(numRows, 1e32);
   std::vector<int> min_ind(numRows, -1);
 
   int ind = 0;
-  for(auto it = g.begin(); it != g.end(); it++) {
+  for(auto it = g.begin(); it != g.end(); ++it, ++ind) {
     double mag = fabs(v2c[ind]);
     sign[it->row] *= (v2c[ind] < 0) ? -1 : 1;
     if(mag < min1[it->row]) {
@@ -70,9 +66,10 @@ void ldpcMinSumDec::update_c2v()
   }
 
   ind = 0;
-  for(auto it = g.begin(); it != g.end(); it++) {
+  for(auto it = g.begin(); it != g.end(); ++it, ++ind) {
     c2v[ind] = sign[it->row] * ((v2c[ind] < 0) ? -1 : 1) * scale;
     c2v[ind] *= min_ind[it->row] == ind ? min2[it->row] : min1[it->row];
   }
   
+  return std::count(sign.begin(), sign.end(), -1);
 }

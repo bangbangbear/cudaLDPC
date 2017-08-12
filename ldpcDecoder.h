@@ -21,7 +21,6 @@ public:
   // return: number of unsatisfied check
   virtual int check_parity(std::vector<int> &hd) {
     std::vector<int> synd(numRows, 0);
-    std::cout <<"g.size() = " << g.size() <<std::endl;
     for(auto it = g.begin(); it != g.end(); ++it) {
       synd[it->row] ^= hd[it->col];
     }

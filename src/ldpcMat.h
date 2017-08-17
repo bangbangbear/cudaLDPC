@@ -12,7 +12,7 @@ public:
   ldpcMatrix(std::string const &fname) {
     loadFromFile(fname);
   }
-  ~ldpcMatrix() {}
+  virtual ~ldpcMatrix() {}
 
   // Load file with a special format.
   // File Format:
@@ -25,9 +25,9 @@ public:
     for(auto it = fdata.begin(); it != fdata.end(); ++it) {
       if(*it <= 0) continue;
       if(*it < last_val) r++;
+      if(*it > c) c= *it;
       entry e = {r-1, *it-1};
       graph.push_back(e);
-      if(*it > c) c= *it;
       last_val = *it;
     }
     numRows = r;

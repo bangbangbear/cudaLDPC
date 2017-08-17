@@ -1,5 +1,7 @@
 #include "ldpcMat.h"
+#include "ldpcMatQC.h"
 #include "ldpcMinSum.h"
+#include "ldpcMinSumQC.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
@@ -7,8 +9,10 @@
 
 int main(int argc, const char *argv[])
 {
-  ldpcMatrix mat(argv[1]);
-  ldpcMinSumDec dec(mat);
+  ldpcMatrixQC mat(argv[1]);
+  // ldpcMatrix mat(argv[1]);
+  // ldpcMinSumDec dec(mat);
+  ldpcMinSumQCDec dec(mat);
 
   float ber = 0.004;
   std::mt19937 rng;

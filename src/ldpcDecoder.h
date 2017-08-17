@@ -16,7 +16,7 @@ public:
 
   virtual ~ldpcDecoder() {}
 
-  virtual std::vector<int> decode(std::vector<double> const &llr) = 0;
+  virtual std::vector<int> decode(std::vector<float> const &llr) = 0;
 
   // input hd: binary vector of hard decision
   // return: number of unsatisfied check

@@ -9,20 +9,20 @@ public:
   ldpcMinSumDec(ldpcMatrix const &mat);
   ~ldpcMinSumDec() {}
 
-  std::vector<int> decode(std::vector<double> const &llr);
+  std::vector<int> decode(std::vector<float> const &llr);
 
 protected:
 
   int update_v2c();
   int update_c2v();
   
-  std::vector<double> v2c;
-  std::vector<double> c2v;
+  std::vector<float> v2c;
+  std::vector<float> c2v;
 
   std::vector<int> hd;
-  std::vector<double> llrIn;
+  std::vector<float> llrIn;
 
-  double scale;
+  float scale;
 };
 
 #endif

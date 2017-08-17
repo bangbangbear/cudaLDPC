@@ -55,7 +55,7 @@ int ldpcMinSumDec::update_c2v()
   int ind = 0;
   for(auto it = g.begin(); it != g.end(); ++it, ++ind) {
     float mag = fabs(v2c[ind]);
-    sign[it->row] *= (v2c[ind] < 0) ? -1 : 1;
+    if(v2c[ind] < 0) sign[it->row] = -sign[it->row];
     if(mag < min1[it->row]) {
       min2[it->row] = min1[it->row];
       min1[it->row] = mag;
@@ -67,8 +67,7 @@ int ldpcMinSumDec::update_c2v()
 
   ind = 0;
   for(auto it = g.begin(); it != g.end(); ++it, ++ind) {
-    c2v[ind] = sign[it->row] * ((v2c[ind] < 0) ? -1 : 1) * scale;
-    c2v[ind] *= min_ind[it->row] == ind ? min2[it->row] : min1[it->row];
+    c2v[ind] = sign[it->row] * ((v2c[ind] < 0) ? -scale : scale) * (min_ind[it->row] == ind ? min2[it->row] : min1[it->row]);
   }
   
   return std::count(sign.begin(), sign.end(), -1);

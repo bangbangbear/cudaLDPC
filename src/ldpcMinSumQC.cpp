@@ -16,11 +16,10 @@ ldpcMinSumQCDec::ldpcMinSumQCDec(ldpcMatrixQC const &mat) :
 std::vector<int> ldpcMinSumQCDec::decode(std::vector<float> const &llr)
 {
   int usc = 0, iter = 0;
-  llrIn = llr;
   do {
     usc = 0;
     for(int i = 0; i < numCircCol; i++) {
-      update_v2c(i);
+      update_v2c(i, llr);
     }
     for(int j = 0; j < numCircRow; j++) {
       usc += update_c2v(j);
@@ -30,7 +29,7 @@ std::vector<int> ldpcMinSumQCDec::decode(std::vector<float> const &llr)
   return hd;
 }
 
-int ldpcMinSumQCDec::update_v2c(int circ_i)
+int ldpcMinSumQCDec::update_v2c(int circ_i, std::vector<float> const &llrIn)
 {
   std::vector<float> sum_llr(&llrIn[circ_i*circSize], &llrIn[(circ_i+1) * circSize]);
 

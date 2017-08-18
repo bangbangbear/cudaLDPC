@@ -9,10 +9,11 @@ public:
   ldpcMinSumQCDec(ldpcMatrixQC const &mat);
   ~ldpcMinSumQCDec() {}
 
-  std::vector<int> decode(std::vector<float> const &llr);
+  virtual std::vector<int> decode(std::vector<float> const &llr);
+  virtual std::string get_name() {return "ldpcMinSumQCDec";}
 
 protected:
-  int update_v2c(int i);
+  int update_v2c(int i, std::vector<float> const &llrIn);
   int update_c2v(int j);
   
   int circSize;

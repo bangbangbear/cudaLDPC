@@ -10,9 +10,13 @@
 int main(int argc, const char *argv[])
 {
   ldpcMatrixQC mat(argv[1]);
-  // ldpcMatrix mat(argv[1]);
-  // ldpcMinSumDec dec(mat);
-  ldpcMinSumQCDec dec(mat);
+  ldpcDecoder *dec;
+  if(argc > 2 && std::string(argv[2]) == "QC") {
+    dec = new ldpcMinSumQCDec(mat);
+  } else {
+    dec = new ldpcMinSumDec(mat);
+  }
+  std::cout <<dec->get_name() <<" is instantiated. " <<std::endl;
 
   float ber = 0.004;
   std::mt19937 rng;
@@ -27,7 +31,7 @@ int main(int argc, const char *argv[])
     std::transform(cwd.begin(), cwd.end(), llr.begin(), std::bind1st(std::minus<float>(), 0.5));
     r += std::count(cwd.begin(), cwd.end(), 1);
     auto start = std::chrono::high_resolution_clock::now();
-    std::vector<int> hd = dec.decode(llr);
+    std::vector<int> hd = dec->decode(llr);
     auto end = std::chrono::high_resolution_clock::now();
     total_time += std::chrono::duration<float, std::milli>(end - start).count();
     u += std::count(hd.begin(), hd.end(), 1);
@@ -36,6 +40,7 @@ int main(int argc, const char *argv[])
             <<", final ber = " << u / (cwd.size() * n * 1.0)
             <<std::endl;
   std::cout << "decoder takes " << total_time <<" ms." <<std::endl;
-  
+
+  delete dec;
   return 0;
 }

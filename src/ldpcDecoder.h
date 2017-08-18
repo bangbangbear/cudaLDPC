@@ -1,6 +1,7 @@
 #ifndef __LDPCDECODER_H__
 #define __LDPCDECODER_H__
 
+#include <string>
 #include <algorithm>
 #include "ldpcMat.h"
 
@@ -30,6 +31,8 @@ public:
   }
 
   virtual void set_maxIter(int iter) {maxIter = iter;}
+
+  virtual std::string get_name() {return "ldpcDecoder";}
     
 protected:
   std::vector<ldpcMatrix::entry> const &g;

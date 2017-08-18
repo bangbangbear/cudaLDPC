@@ -9,7 +9,8 @@ public:
   ldpcMinSumDec(ldpcMatrix const &mat);
   ~ldpcMinSumDec() {}
 
-  std::vector<int> decode(std::vector<float> const &llr);
+  virtual std::vector<int> decode(std::vector<float> const &llr);
+  virtual std::string get_name() {return "ldpcMinSumDec";}
 
 protected:
 

@@ -63,8 +63,11 @@ int ldpcMinSumQCDec::update_c2v(int circ_j)
   for(size_t i = 0; i < row_circs[circ_j].size(); i++) {
     int col = row_circs[circ_j][i].ind;
     for(int j = 0; j < circSize; j++) {
-      float mag = fabs(v2c[col][circ_j][j]);
-      if(v2c[col][circ_j][j] < 0) sign[j] = -sign[j];
+      float mag = v2c[col][circ_j][j];
+      if(mag < 0) {
+        mag = -mag;
+        sign[j] = -sign[j];
+      }
       if(mag < min1[j]) {
         min2[j] = min1[j];
         min1[j] = mag;
@@ -78,7 +81,7 @@ int ldpcMinSumQCDec::update_c2v(int circ_j)
   for(size_t i = 0; i < row_circs[circ_j].size(); i++) {
     int col = row_circs[circ_j][i].ind;
     for(int j = 0; j < circSize; j++) {
-      c2v[circ_j][col][j] = sign[j] * ((v2c[col][circ_j][j] < 0) ? -scale : scale) * ((min_ind[j] == col) ? min2[j] : min1[j]);
+      c2v[circ_j][col][j] = (((sign[j] * v2c[col][circ_j][j]) < 0) ? -scale : scale) * ((min_ind[j] == col) ? min2[j] : min1[j]);
     }
   }
 

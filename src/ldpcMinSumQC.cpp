@@ -4,24 +4,26 @@
 ldpcMinSumQCDec::ldpcMinSumQCDec(ldpcMatrixQC const &mat) :
   ldpcMinSumDec(mat),
   circSize(mat.get_circSize()),
-  numCircRow(mat.get_numCircRows()),
-  numCircCol(mat.get_numCircCols()),
+  numCircRows(mat.get_numCircRows()),
+  numCircCols(mat.get_numCircCols()),
   row_circs(mat.get_row_circulants()),
   col_circs(mat.get_col_circulants()),
-  c2v(numCircRow, std::vector<std::vector<float>>(numCircCol, std::vector<float>(circSize, 0.0))),
-  v2c(numCircCol, std::vector<std::vector<float>>(numCircRow, std::vector<float>(circSize, 0.0)))
+  c2v(numCircRows, std::vector<std::vector<float>>(numCircCols, std::vector<float>(circSize, 0.0))),
+  v2c(numCircRows, std::vector<std::vector<float>>(numCircCols, std::vector<float>(circSize, 0.0)))
 {
 }
 
 std::vector<int> ldpcMinSumQCDec::decode(std::vector<float> const &llr)
 {
   int usc = 0, iter = 0;
+  c2v.assign(numCircRows, std::vector<std::vector<float>>(numCircCols, std::vector<float>(circSize, 0.0)));
+
   do {
     usc = 0;
-    for(int i = 0; i < numCircCol; i++) {
+    for(int i = 0; i < numCircCols; i++) {
       update_v2c(i, llr);
     }
-    for(int j = 0; j < numCircRow; j++) {
+    for(int j = 0; j < numCircRows; j++) {
       usc += update_c2v(j);
     }
   } while(usc && ++iter < maxIter);
@@ -45,7 +47,7 @@ int ldpcMinSumQCDec::update_v2c(int circ_i, std::vector<float> const &llrIn)
     int row = col_circs[circ_i][j].ind;
     int offset = col_circs[circ_i][j].offset;
     for(int i = 0; i < circSize; i++) {
-      v2c[circ_i][row][i] = sum_llr[(i+offset) & 0x7f] - c2v[row][circ_i][i];
+      v2c[row][circ_i][i] = sum_llr[(i+offset) & 0x7f] - c2v[row][circ_i][i];
     }
   }
 
@@ -63,7 +65,7 @@ int ldpcMinSumQCDec::update_c2v(int circ_j)
   for(size_t i = 0; i < row_circs[circ_j].size(); i++) {
     int col = row_circs[circ_j][i].ind;
     for(int j = 0; j < circSize; j++) {
-      float mag = v2c[col][circ_j][j];
+      float mag = v2c[circ_j][col][j];
       if(mag < 0) {
         mag = -mag;
         sign[j] = -sign[j];
@@ -81,7 +83,7 @@ int ldpcMinSumQCDec::update_c2v(int circ_j)
   for(size_t i = 0; i < row_circs[circ_j].size(); i++) {
     int col = row_circs[circ_j][i].ind;
     for(int j = 0; j < circSize; j++) {
-      c2v[circ_j][col][j] = (((sign[j] * v2c[col][circ_j][j]) < 0) ? -scale : scale) * ((min_ind[j] == col) ? min2[j] : min1[j]);
+      c2v[circ_j][col][j] = (((sign[j] * v2c[circ_j][col][j]) < 0) ? -scale : scale) * ((min_ind[j] == col) ? min2[j] : min1[j]);
     }
   }
 

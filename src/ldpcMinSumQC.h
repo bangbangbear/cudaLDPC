@@ -17,7 +17,7 @@ protected:
   int update_c2v(int j);
   
   int circSize;
-  int numCircRow, numCircCol;
+  int numCircRows, numCircCols;
   std::vector<std::vector<ldpcMatrixQC::circ_entry>> const &row_circs;
   std::vector<std::vector<ldpcMatrixQC::circ_entry>> const &col_circs;
 

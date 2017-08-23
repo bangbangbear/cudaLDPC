@@ -1,8 +1,8 @@
-CPP = nvcc
-CC = gcc 
+CPP = g++
+CC = gcc
+NVCC = nvcc
 
-CFLAGS= -arch sm_61
-CPPFLAGS= -std=c++11
+CFLAGS= -Wall
 
 ifeq ($(VER), debug)
 CFLAGS+= -ggdb
@@ -10,25 +10,33 @@ else
 CFLAGS+= -O3
 endif
 
+CPPFLAGS= -std=c++11
+NVCCFLAGS= -arch sm_61
+
+LIBFLAGS= -lcudart -L/opt/cuda/lib64
+
 ROOTDIR=$(shell echo $(CURDIR))
 SRCDIR=$(ROOTDIR)/src
 VPATH=${SRCDIR}
 
 SRC=$(wildcard ${SRCDIR}/*.cpp)
-OBJ=$(notdir $(SRC:.cpp=.o))
+OBJ=$(notdir $(SRC:.cpp=.cpp.o))
+
+CUSRC=$(wildcard ${SRCDIR}/*.cu)
+CUOBJ=$(notdir $(CUSRC:.cu=.cu.o))
 
 INCLUDE= -I${SRCDIR} -I/opt/cuda/include/
 
-dec: $(OBJ)
+dec: $(CUOBJ) $(OBJ) 
 	$(CPP) $(CFLAGS) $(CPPFLAGS) $(LIBFLAGS) -o $@  $^
 
-%.o: %.cpp
+%.cpp.o: %.cpp
 	@echo C++ -c -o $@ 
 	@$(CPP) $(CFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
 
-%.o: %.cu
+%.cu.o: %.cu
 	@echo C++ -c -o $@ 
-	@$(CPP) $(CFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
+	@$(NVCC) $(NVCCFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
 
 %.o: %.c
 	@echo CC -c -o $@ 
@@ -38,7 +46,7 @@ dec: $(OBJ)
 clean:
 	@rm -f dec
 #	@rm -f *.so
-	@rm -f $(OBJ)
+	@rm -f $(OBJ) $(CUOBJ)
 	@find $(ROOTDIR)/src -name "*.d" -exec rm {} \;
 	@find $(ROOTDIR)/src -name "*.d.*" -exec rm {} \;
 	@echo Directory cleaned up. 

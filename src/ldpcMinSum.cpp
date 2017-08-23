@@ -17,6 +17,7 @@ std::vector<int> ldpcMinSumDec::decode(std::vector<float> const &llr)
 {
   hd.assign(hd.size(), 1);
   llrIn = llr;
+  c2v.assign(c2v.size(), 0);
 
   int usc = -1;
   for(int i = 0; i < maxIter && usc; i++) {

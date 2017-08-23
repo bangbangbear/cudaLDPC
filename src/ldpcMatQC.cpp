@@ -16,4 +16,11 @@ ldpcMatrixQC::ldpcMatrixQC(std::string const &fname) :
       row_circs[it->row/circSize].push_back(e2);
     }
   }
+
+  for(auto it = row_circs.begin(); it != row_circs.end(); ++it) {
+    row_weight.push_back(it->size());
+  }
+  for(auto it = col_circs.begin(); it != col_circs.end(); ++it) {
+    col_weight.push_back(it->size());
+  }
 }

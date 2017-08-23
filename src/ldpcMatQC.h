@@ -16,9 +16,13 @@ public:
   int get_numCircRows() const {return numRows/circSize;}
   int get_numCircCols() const {return numCols/circSize;}
 
+  std::vector<int> const &get_row_weight() const {return row_weight;}
+  std::vector<int> const &get_col_weight() const {return col_weight;}
+
 protected:
   std::vector<circ_entry> circ_graph;
   std::vector<std::vector<circ_entry>> row_circs, col_circs;
+  std::vector<int> row_weight, col_weight;
 
   int numCircRows, numCircCols;
   int circSize;

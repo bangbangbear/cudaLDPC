@@ -33,7 +33,6 @@ __global__ void update_v2c_kernel(float *v2c, float * c2v, int *hd, const float 
 
 __global__ void update_c2v_kernel(float *v2c, float *c2v, int *usc, ldpcMatrixQC::circ_entry *circ_row, int *row_weight, int max_colWeight, int numCircRows, int numCircCols)
 {
-  // int row = blockIdx.x * blockDim.x + threadIdx.x;
   float min1 = 1e32, min2;
   int min_ind, sign = 1, i;
   int weight = row_weight[blockIdx.x];

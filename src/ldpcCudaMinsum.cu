@@ -11,17 +11,17 @@
 __global__ void update_v2c_kernel(float *v2c, float * c2v, int *hd, const float *llr, const ldpcMatrixQC::circ_entry *col_circ, const int *col_weight, int max_colWeight, int numCircRows, int numCircCols)
 {
   const int col = blockIdx.x * blockDim.x + threadIdx.x;
-  __shared__ float sum_llr[CIRC_SIZE];
+  float sum_llr;
   const int weight = col_weight[blockIdx.x];
   const ldpcMatrixQC::circ_entry *this_col = col_circ + max_colWeight * blockIdx.x;
   int i = 0;
 
-  sum_llr[threadIdx.x] = llr[col];
+  sum_llr = llr[col];
   for(i = 0; i < weight; i++) {
     int offset = threadIdx.x - this_col[i].offset;
     if (offset < 0) offset += CIRC_SIZE;
     int circ_ind = this_col[i].ind * numCircCols + blockIdx.x;
-    sum_llr[threadIdx.x] += c2v[circ_ind * blockDim.x + offset];
+    sum_llr += c2v[circ_ind * blockDim.x + offset];
   }
 
   for(i = 0; i < weight; i++) {
@@ -29,9 +29,9 @@ __global__ void update_v2c_kernel(float *v2c, float * c2v, int *hd, const float 
     if (offset < 0) offset += CIRC_SIZE;
     int circ_ind = this_col[i].ind * numCircCols + blockIdx.x;
     int ind = circ_ind * blockDim.x + offset;
-    v2c[ind] = sum_llr[threadIdx.x] - c2v[ind];
+    v2c[ind] = sum_llr - c2v[ind];
   }
-  hd[col] = sum_llr[threadIdx.x] < 0;
+  hd[col] = sum_llr < 0;
 }
 
 __global__ void update_c2v_kernel(float *v2c, float *c2v, int *usc, ldpcMatrixQC::circ_entry *circ_row, int *row_weight, int max_colWeight, int numCircRows, int numCircCols)

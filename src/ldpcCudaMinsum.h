@@ -57,10 +57,10 @@ private:
   float *c2v_cuda, *v2c_cuda;
   float *llr_cuda;
   int *usc_cuda, *hd_cuda;
-  __constant__ ldpcMatrixQC::circ_entry *row_circs_cuda;
-  __constant__ ldpcMatrixQC::circ_entry *col_circs_cuda;
-  __constant__ int *row_weight_cuda;
-  __constant__ int *col_weight_cuda;
+  ldpcMatrixQC::circ_entry *row_circs_cuda;
+  ldpcMatrixQC::circ_entry *col_circs_cuda;
+  int *row_weight_cuda;
+  int *col_weight_cuda;
   int max_rowWeight, max_colWeight;
 
   std::vector<ldpcMatrixQC::circ_entry> row_circs_host;

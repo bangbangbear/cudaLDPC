@@ -18,15 +18,18 @@ __global__ void update_v2c_kernel(float *v2c, float * c2v, int *hd, const float 
 
   sum_llr[threadIdx.x] = llr[col];
   for(i = 0; i < weight; i++) {
-    int offset = (threadIdx.x - this_col[i].offset) & 0x7f;
+    int offset = threadIdx.x - this_col[i].offset;
+    if (offset < 0) offset += CIRC_SIZE;
     int circ_ind = this_col[i].ind * numCircCols + blockIdx.x;
     sum_llr[threadIdx.x] += c2v[circ_ind * blockDim.x + offset];
   }
 
   for(i = 0; i < weight; i++) {
-    int offset = (threadIdx.x - this_col[i].offset) & 0x7f;
+    int offset = threadIdx.x - this_col[i].offset;
+    if (offset < 0) offset += CIRC_SIZE;
     int circ_ind = this_col[i].ind * numCircCols + blockIdx.x;
-    v2c[circ_ind * blockDim.x + offset] = sum_llr[threadIdx.x] - c2v[circ_ind * blockDim.x + offset];
+    int ind = circ_ind * blockDim.x + offset;
+    v2c[ind] = sum_llr[threadIdx.x] - c2v[ind];
   }
   hd[col] = sum_llr[threadIdx.x] < 0;
 }

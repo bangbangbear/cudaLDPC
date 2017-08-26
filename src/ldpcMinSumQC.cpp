@@ -38,16 +38,22 @@ int ldpcMinSumQCDec::update_v2c(int circ_i, std::vector<float> const &llrIn)
   for(size_t j = 0; j < col_circs[circ_i].size(); j++) {
     int row = col_circs[circ_i][j].ind;
     int offset = col_circs[circ_i][j].offset;
-    for(int i = 0; i < circSize; i++) {
-      sum_llr[i] += c2v[row][circ_i][(i-offset) & 0x7f];
+    for(int i = 0; i < offset; i++) {
+      sum_llr[i] += c2v[row][circ_i][circSize+i-offset];
+    }
+    for(int i = offset; i < circSize; i++) {
+      sum_llr[i] += c2v[row][circ_i][i-offset];
     }
   }
 
   for(size_t j = 0; j < col_circs[circ_i].size(); j++) {
     int row = col_circs[circ_i][j].ind;
     int offset = col_circs[circ_i][j].offset;
-    for(int i = 0; i < circSize; i++) {
-      v2c[row][circ_i][i] = sum_llr[(i+offset) & 0x7f] - c2v[row][circ_i][i];
+    for(int i = 0; i < circSize - offset; i++) {
+      v2c[row][circ_i][i] = sum_llr[i+offset] - c2v[row][circ_i][i];
+    }
+    for(int i = circSize - offset; i < circSize; i++) {
+      v2c[row][circ_i][i] = sum_llr[i+offset - circSize] - c2v[row][circ_i][i];
     }
   }
 

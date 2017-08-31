@@ -36,7 +36,7 @@ dec: $(CUOBJ) $(OBJ)
 	@$(CPP) $(CFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
 
 %.cu.o: %.cu
-	@echo C++ -c -o $@ 
+	@echo NVCC -c -o $@ 
 	@$(NVCC) $(NVCCFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
 
 %.o: %.c
@@ -52,9 +52,15 @@ clean:
 	@find $(ROOTDIR)/src -name "*.d.*" -exec rm {} \;
 	@echo Directory cleaned up. 
 
-include $(SRC:.cpp=.cpp.d)
+include $(SRC:.cpp=.cpp.d) $(CUSRC:.cu=.cu.d)
 %.cpp.d: %.cpp
 	@set -e; rm -f $@; \
 	g++ -MM $(CPPFLAGS) $(INCLUDE) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+%.cu.d: %.cu
+	@set -e; rm -f $@; \
+	nvcc -M -Wno-deprecated-gpu-targets $(CPPFLAGS) $(INCLUDE) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$

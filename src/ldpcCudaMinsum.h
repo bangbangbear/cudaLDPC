@@ -67,5 +67,4 @@ private:
   std::vector<ldpcMatrixQC::circ_entry> col_circs_host;
 };
 
-
 #endif

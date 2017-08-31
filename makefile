@@ -26,6 +26,7 @@ CUSRC=$(wildcard ${SRCDIR}/*.cu)
 CUOBJ=$(notdir $(CUSRC:.cu=.cu.o))
 
 INCLUDE= -I${SRCDIR} -I/opt/cuda/include/
+.SUFFIXES: .cpp .c .h .y .l .o .cu
 
 dec: $(CUOBJ) $(OBJ) 
 	$(CPP) $(CFLAGS) $(CPPFLAGS) $(LIBFLAGS) -o $@  $^
@@ -51,10 +52,9 @@ clean:
 	@find $(ROOTDIR)/src -name "*.d.*" -exec rm {} \;
 	@echo Directory cleaned up. 
 
-include $(SRC:.cpp=.d)
-%.d: %.cpp
+include $(SRC:.cpp=.cpp.d)
+%.cpp.d: %.cpp
 	@set -e; rm -f $@; \
 	g++ -MM $(CPPFLAGS) $(INCLUDE) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
-

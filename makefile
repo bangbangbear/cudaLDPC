@@ -20,10 +20,10 @@ SRCDIR=$(ROOTDIR)/src
 VPATH=${SRCDIR}
 
 SRC=$(wildcard ${SRCDIR}/*.cpp)
-OBJ=$(notdir $(SRC:.cpp=.cpp.o))
+OBJ=$(notdir $(SRC:.cpp=.o))
 
 CUSRC=$(wildcard ${SRCDIR}/*.cu)
-CUOBJ=$(notdir $(CUSRC:.cu=.cu.o))
+CUOBJ=$(notdir $(CUSRC:.cu=.o))
 
 INCLUDE= -I${SRCDIR} -I/opt/cuda/include/
 .SUFFIXES: .cpp .c .h .y .l .o .cu
@@ -31,35 +31,30 @@ INCLUDE= -I${SRCDIR} -I/opt/cuda/include/
 dec: $(CUOBJ) $(OBJ) 
 	$(CPP) $(CFLAGS) $(CPPFLAGS) $(LIBFLAGS) -o $@  $^
 
-%.cpp.o: %.cpp
+%.o: %.cpp
 	@echo C++ -c -o $@ 
 	@$(CPP) $(CFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
 
-%.cu.o: %.cu
+%.o: %.cu
 	@echo NVCC -c -o $@ 
 	@$(NVCC) $(NVCCFLAGS) $(CPPFLAGS) $(INCLUDE) -c -o $@ $<
-
-%.o: %.c
-	@echo CC -c -o $@ 
-	@$(CC) $(CFLAGS) $(INCLUDE) -c -o $@ $<
 
 .PHONY: clean
 clean:
 	@rm -f dec
-#	@rm -f *.so
 	@rm -f $(OBJ) $(CUOBJ)
 	@find $(ROOTDIR)/src -name "*.d" -exec rm {} \;
 	@find $(ROOTDIR)/src -name "*.d.*" -exec rm {} \;
 	@echo Directory cleaned up. 
 
-include $(SRC:.cpp=.cpp.d) $(CUSRC:.cu=.cu.d)
-%.cpp.d: %.cpp
+include $(SRC:.cpp=.d) $(CUSRC:.cu=.d)
+%.d: %.cpp
 	@set -e; rm -f $@; \
 	g++ -MM $(CPPFLAGS) $(INCLUDE) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-%.cu.d: %.cu
+%.d: %.cu
 	@set -e; rm -f $@; \
 	nvcc -M -Wno-deprecated-gpu-targets $(CPPFLAGS) $(INCLUDE) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
